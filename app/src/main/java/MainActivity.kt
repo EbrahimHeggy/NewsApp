@@ -1,5 +1,9 @@
 package com.example.newsapplication
+import Article
+import OnArticlieClickListener
 import RecyclerAdapter
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -7,6 +11,7 @@ import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +23,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 const val BASE_URL = "https://api.currentsapi.services"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() ,OnArticlieClickListener{
 
     lateinit var countdownTimer: CountDownTimer
     private var seconds = 3L
@@ -27,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private var descList = mutableListOf<String>()
     private var imagesList = mutableListOf<String>()
     private var linksList = mutableListOf<String>()
+    private var myDataArticle :Article? = null
+    private var myDataArticleList :ArrayList<Article?>? = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,11 +70,12 @@ class MainActivity : AppCompatActivity() {
 
                 for (article in response.news) {
                     Log.d("MainActivity", "Result + $article")
-                    addToList(article.title, article.description, article.image, article.url)
+                    myDataArticle =  Article(article.title, article.description, article.url,article.image)
+                    myDataArticleList?.add(myDataArticle)
                 }
 
                 //updates ui when data has been retrieved
-                withContext(Dispatchers.Main) {
+                GlobalScope.launch(Dispatchers.Main) {
                     setUpRecyclerView()
                     fadeIn()
                     progressBar.visibility = View.GONE
@@ -107,9 +115,19 @@ class MainActivity : AppCompatActivity() {
     private fun setUpRecyclerView() {
         recyclerView=findViewById(R.id.rv_rv)
         recyclerView.layoutManager = LinearLayoutManager(applicationContext)
-        recyclerView.adapter = RecyclerAdapter(titlesList, descList, imagesList, linksList)
+        recyclerView.adapter = myDataArticleList?.let {
+            RecyclerAdapter(it, this)
+        }
+
+//        var myNameClass = MyNameClass(name = "ahmed")
+//        myNameClass.apply {
+//            this.name = "My New Name"
+//            this.age = "10"
+//        }
+        // let  apply  run
     }
 
+    data class MyNameClass  (var name :String,var age :String = "10")
     //adds the items to our recyclerview
     private fun addToList(title: String, description: String, image: String, link: String) {
         linksList.add(link)
@@ -117,4 +135,15 @@ class MainActivity : AppCompatActivity() {
         descList.add(description)
         imagesList.add(image)
     }
+
+    override fun itemClick(myArticle: Article) {
+        Toast.makeText(this,myArticle.title + myArticle.details,Toast.LENGTH_LONG).show()
+    }
+
+    override fun imageClick(myArticle: Article) {
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.data = Uri.parse(myArticle.link)
+                startActivity( intent)
+    }
+
 }

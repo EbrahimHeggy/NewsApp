@@ -3,19 +3,19 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.newsapplication.R
 
-
+data class Article(val title: String, val details: String, val link: String,val image:String)
 class RecyclerAdapter(
-    private var titles: List<String>,
-    private var details: List<String>,
-    private var images: List<String>,
-    private var links: List<String>
+    private val articles: ArrayList<Article?>,
+    var listener: OnArticlieClickListener
 ) :
     RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
 
@@ -27,12 +27,17 @@ class RecyclerAdapter(
 
         // clickListeners events
         init {
+            itemPicture.setOnClickListener {
+                //listener(titles[adapterPosition])
+//                Toast.makeText(this,"this is my Pic",Toast.LENGTH_LONG).show()
+            }
             itemView.setOnClickListener { v: View ->
-                val position: Int = adapterPosition // lamda ex
 
-                val intent = Intent(Intent.ACTION_VIEW)
-                intent.data = Uri.parse(links[position])
-                startActivity(itemView.context, intent,null)
+//                val position: Int = adapterPosition // lamda ex
+//
+//                val intent = Intent(Intent.ACTION_VIEW)
+//                intent.data = Uri.parse(links[position])
+//                startActivity(itemView.context, intent,null)
             }
         }
     }
@@ -43,15 +48,26 @@ class RecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return titles.size
+        return articles?.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.itemTitle.text = titles[position]
-        holder.itemDetail.text = details[position]
-
+        val myArticle = articles[position]!!
+        holder.itemView.setOnClickListener{
+            listener.itemClick(myArticle)
+        }
+        holder.itemTitle.text = myArticle.title
+        holder.itemDetail.text = myArticle.details
+        holder.itemPicture.setOnClickListener {
+            listener.imageClick(myArticle)
+        }
         Glide.with(holder.itemPicture)
-            .load(images[position])
+            .load(myArticle.image)
             .into(holder.itemPicture)
     }
+}
+
+interface OnArticlieClickListener {
+ fun itemClick(myArticle: Article)
+ fun imageClick(myArticle: Article)
 }
