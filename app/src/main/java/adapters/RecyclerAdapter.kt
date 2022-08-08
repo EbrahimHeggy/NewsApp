@@ -16,8 +16,7 @@ data class Article(val title: String, val details: String, val link: String,val 
 class RecyclerAdapter(
     private val articles: ArrayList<Article?>,
     var listener: OnArticlieClickListener
-) :
-    RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>(),View.OnClickListener {
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -50,8 +49,9 @@ class RecyclerAdapter(
     override fun getItemCount(): Int {
         return articles?.size
     }
-
+        var mPosition = -1
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        mPosition = position
         val myArticle = articles[position]!!
         holder.itemView.setOnClickListener{
             listener.itemClick(myArticle)
@@ -62,8 +62,21 @@ class RecyclerAdapter(
             listener.imageClick(myArticle)
         }
         Glide.with(holder.itemPicture)
-            .load(myArticle.image)
+            .load("https://picsum.photos/100/200")
             .into(holder.itemPicture)
+
+    }
+
+    override fun onClick(myview: View?) {
+       if(myview?.id == R.id.iv_image ) {
+           articles[mPosition]?.let {
+               listener.imageClick(it)
+           }
+       }
+        if(myview?.id == R.id.tv_title ) {
+
+        }
+
     }
 }
 

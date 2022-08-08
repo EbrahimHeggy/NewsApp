@@ -23,10 +23,21 @@
 
             <ImageView
                 android:id="@+id/iv_image"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
                 android:layout_margin="10dp"
                 android:src="@mipmap/ic_launcher_round" />
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/animation_view"
+                android:visibility="visible"
+                app:lottie_rawRes="@raw/checked_complete"
+                app:lottie_autoPlay="true"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:layout_margin="10dp"
+                app:lottie_loop="true" />
+
 
             <TextView
                 android:id="@+id/tv_title"
